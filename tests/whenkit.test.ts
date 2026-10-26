@@ -17,6 +17,8 @@ test("parseDuration: bare numbers are ms; number passthrough", () => {
 test("parseDuration: rejects garbage", () => {
   expect(() => parseDuration("")).toThrow();
   expect(() => parseDuration("banana")).toThrow();
+  expect(() => parseDuration("5 months")).toThrow();
+  expect(() => parseDuration("1h foo 30m")).toThrow();
 });
 
 test("formatDuration: compact + parts cap", () => {
@@ -43,4 +45,10 @@ test("humanize: past, future, now", () => {
 test("toUnit converts", () => {
   expect(toUnit("2h", "m")).toBe(120);
   expect(toUnit("1d", "h")).toBe(24);
+});
+
+test("humanize: invalid dates throw instead of 'just now'", () => {
+  expect(() => humanize(new Date("nope"))).toThrow();
+  expect(() => humanize(NaN, 0)).toThrow();
+  expect(() => humanize(0, new Date("nope"))).toThrow();
 });

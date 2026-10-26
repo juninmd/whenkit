@@ -17,9 +17,9 @@ toUnit("1d", "h");                 // 24
 ## API
 | fn | signature | notes |
 |----|-----------|-------|
-| `parseDuration` | `(string \| number) → ms` | units `w d h m s ms`; bare number = ms; throws on garbage |
+| `parseDuration` | `(string \| number) → ms` | units `w d h m s ms`; bare number = ms; throws on garbage or trailing text (`"5 months"`) |
 | `formatDuration` | `(ms, {parts?, separator?}) → string` | compact, sign-aware, `parts` caps segments |
-| `humanize` | `(date, now?) → string` | `"3 hours ago"` / `"in 2 days"` / `"just now"` |
+| `humanize` | `(date, now?) → string` | `"3 hours ago"` / `"in 2 days"` / `"just now"`; throws on invalid dates |
 | `toUnit` | `(dur, unit) → number` | convert to a unit as float |
 
 ## Dev

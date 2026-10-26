@@ -21,6 +21,7 @@ const ORDER: Array<[Unit, number]> = [
 ];
 
 const TOKEN = /(-?\d+(?:\.\d+)?)\s*(ms|s|m|h|d|w)/gi;
+const FULL = /^(?:-?\d+(?:\.\d+)?\s*(?:ms|s|m|h|d|w)\s*)+$/i;
 
 /**
  * Parse a duration string like "1h30m", "2.5h", "90 m", "-1d" into milliseconds.
@@ -32,14 +33,13 @@ export function parseDuration(input: string | number): number {
   if (trimmed === "") throw new Error("empty duration");
   if (/^-?\d+(\.\d+)?$/.test(trimmed)) return Number(trimmed);
 
+  if (!FULL.test(trimmed)) throw new Error(`cannot parse duration: "${input}"`);
+
   let total = 0;
-  let matched = false;
   TOKEN.lastIndex = 0;
   for (let m = TOKEN.exec(trimmed); m; m = TOKEN.exec(trimmed)) {
-    matched = true;
     total += Number(m[1]) * UNIT_MS[m[2].toLowerCase() as Unit];
   }
-  if (!matched) throw new Error(`cannot parse duration: "${input}"`);
   return total;
 }
 
@@ -84,11 +84,12 @@ const REL: Array<[Unit, number, string]> = [
 
 /**
  * Human relative time between `date` and `now` (default: current time).
- * Past → "3 hours ago", future → "in 2 days", <1s → "just now".
+ * Past → "3 hours ago", future → "in 2 days", <1s → "just now". Throws on invalid dates.
  */
 export function humanize(date: Date | number, now: Date | number = Date.now()): string {
   const then = typeof date === "number" ? date : date.getTime();
   const ref = typeof now === "number" ? now : now.getTime();
+  if (Number.isNaN(then) || Number.isNaN(ref)) throw new Error("invalid date");
   const diff = ref - then;
   const abs = Math.abs(diff);
   if (abs < UNIT_MS.s) return "just now";
